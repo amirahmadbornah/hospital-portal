@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>داشبورد مدیریت لینک‌ها | پورتال بیمارستان</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon/favicon.svg" />
+  <link rel="stylesheet" href="../assets/css/style.css?v=12.2.2" />
+  <link rel="stylesheet" href="admin.css?v=1.0.0" />
+</head>
+<body>
+  <header class="site-header admin-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand__logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 21s-7.5-4.7-9.8-9.6C.7 7.8 2.6 4.5 6 4.1c2-.2 3.6.8 4.7 2.3M12 21s7.5-4.7 9.8-9.6c1.5-3.6-.4-6.9-3.8-7.3-2-.2-3.6.8-4.7 2.3" />
+            <path d="M9 12h2l1-2 2 4 1-2h2" />
+          </svg>
+        </div>
+        <div class="brand__text">
+          <h1 class="brand__title">پنل مدیریت لینک‌ها</h1>
+          <p class="brand__subtitle" id="admin-username-label">—</p>
+        </div>
+      </div>
+
+      <button type="button" id="theme-toggle" class="theme-toggle" aria-label="تغییر حالت روشن/تیره" title="تغییر حالت روشن/تیره">
+        <svg class="icon icon--sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4.5" /><path d="M12 2.5v2.5M12 19v2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M2.5 12H5M19 12h2.5M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8" />
+        </svg>
+        <svg class="icon icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" />
+        </svg>
+      </button>
+
+      <a href="announcements.html" class="admin-btn">مدیریت اعلان‌ها</a>
+      <a href="../index.html" class="admin-btn" target="_blank" rel="noopener noreferrer">مشاهده پرتال</a>
+      <button type="button" id="logout-btn" class="admin-btn admin-btn--danger">خروج</button>
+    </div>
+  </header>
+
+  <main class="page-wrap admin-main">
+    <div class="admin-toolbar">
+      <div class="header-search admin-search">
+        <svg class="icon icon--search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="10.5" cy="10.5" r="6.5" /><path d="M20 20l-4.8-4.8" />
+        </svg>
+        <input type="search" id="search-input" placeholder="جستجو در عنوان، توضیح یا دسته..." autocomplete="off" />
+      </div>
+      <select id="category-filter" class="admin-select">
+        <option value="">همه دسته‌ها</option>
+      </select>
+      <button type="button" id="add-link-btn" class="admin-btn admin-btn--primary">+ لینک جدید</button>
+    </div>
+
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>ردیف</th>
+            <th>عنوان</th>
+            <th>توضیح</th>
+            <th>دسته</th>
+            <th>آدرس</th>
+            <th>آیکون</th>
+            <th>ترتیب</th>
+            <th>وضعیت</th>
+            <th>عملیات</th>
+          </tr>
+        </thead>
+        <tbody id="links-tbody"></tbody>
+      </table>
+      <p id="empty-message" class="admin-empty" hidden>لینکی یافت نشد.</p>
+    </div>
+  </main>
+
+  <!-- Create / edit modal -->
+  <div id="link-modal" class="admin-modal-overlay" hidden>
+    <form id="link-form" class="admin-modal" novalidate>
+      <h2 id="link-modal-title">لینک جدید</h2>
+      <input type="hidden" id="link-id" />
+
+      <label class="admin-field">
+        <span>عنوان</span>
+        <input type="text" id="field-title" required maxlength="150" />
+      </label>
+      <label class="admin-field">
+        <span>توضیح</span>
+        <input type="text" id="field-description" maxlength="400" />
+      </label>
+      <label class="admin-field">
+        <span>آدرس (URL)</span>
+        <input type="url" id="field-url" required placeholder="https://example.com" />
+      </label>
+      <label class="admin-field">
+        <span>دسته‌بندی</span>
+        <select id="field-category" required></select>
+      </label>
+      <label class="admin-field">
+        <span>آیکون</span>
+        <select id="field-icon" required></select>
+      </label>
+      <label class="admin-field">
+        <span>ترتیب نمایش</span>
+        <input type="number" id="field-order" min="0" step="1" />
+      </label>
+      <label class="admin-checkbox">
+        <input type="checkbox" id="field-enabled" checked />
+        <span>فعال</span>
+      </label>
+      <label class="admin-checkbox">
+        <input type="checkbox" id="field-favorite-allowed" checked />
+        <span>قابل افزودن به موردعلاقه‌ها</span>
+      </label>
+
+      <div id="form-error" class="admin-error" hidden></div>
+
+      <div class="admin-modal__actions">
+        <button type="button" class="admin-btn" id="cancel-form-btn">انصراف</button>
+        <button type="submit" class="admin-btn admin-btn--primary" id="save-link-btn">ذخیره</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Delete confirmation modal -->
+  <div id="confirm-modal" class="admin-modal-overlay" hidden>
+    <div class="admin-modal admin-modal--small">
+      <p id="confirm-message">آیا از حذف این لینک مطمئن هستید؟</p>
+      <div class="admin-modal__actions">
+        <button type="button" class="admin-btn" id="confirm-no-btn">خیر</button>
+        <button type="button" class="admin-btn admin-btn--danger" id="confirm-yes-btn">بله</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <script src="../assets/js/storage.js?v=1.0.0"></script>
+  <script src="../assets/js/theme.js?v=1.0.0"></script>
+  <script src="admin.js?v=1.0.0"></script>
+</body>
+</html>

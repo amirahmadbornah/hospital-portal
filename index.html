@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="description" content="پورتال داخلی بیمارستان — دسترسی سریع به سیستم‌های بالینی و اداری" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>پورتال داخلی بیمارستان</title>
+
+  <link rel="icon" type="image/svg+xml" href="favicon/favicon.svg" />
+  <link rel="alternate icon" href="favicon/favicon.svg" />
+
+  <!-- PWA: installable on desktop, Android and tablets -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0F6E67" />
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
+
+  <!-- PWA: Apple/Safari support (feature #14) -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="پورتال بیمارستان" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
+  <!-- PWA: Microsoft/Windows tile support (feature #15) -->
+  <meta name="msapplication-TileColor" content="#0F6E67" />
+  <meta name="msapplication-config" content="browserconfig.xml" />
+
+  <!-- v12.3.0 : bump this query string (and config.json's portalVersion)
+       on every deploy so browsers never serve a stale stylesheet. -->
+  <link rel="stylesheet" href="assets/css/style.css?v=2.0.0" />
+</head>
+<body>
+
+  <!-- Loading overlay, hidden by app.js once the first data load finishes -->
+  <div id="loading-overlay" class="loading-overlay">
+    <div class="loading-spinner" role="status" aria-label="در حال بارگذاری"></div>
+    <span>در حال بارگذاری پورتال...</span>
+  </div>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand__logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 21s-7.5-4.7-9.8-9.6C.7 7.8 2.6 4.5 6 4.1c2-.2 3.6.8 4.7 2.3M12 21s7.5-4.7 9.8-9.6c1.5-3.6-.4-6.9-3.8-7.3-2-.2-3.6.8-4.7 2.3" />
+            <path d="M9 12h2l1-2 2 4 1-2h2" />
+          </svg>
+        </div>
+        <div class="brand__text">
+          <h1 class="brand__title" id="header-title">پورتال داخلی بیمارستان</h1>
+          <p class="brand__subtitle">دسترسی یکپارچه به سیستم‌های بیمارستان</p>
+        </div>
+      </div>
+
+      <div class="header-clock" aria-live="polite">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" /><path d="M12 7v5l3.5 2" />
+        </svg>
+        <div>
+          <div class="header-clock__time" id="clock-time">--:--:--</div>
+          <div class="header-clock__date" id="clock-date">در حال محاسبه تاریخ...</div>
+        </div>
+      </div>
+
+      <div class="header-search">
+        <svg class="icon icon--search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="10.5" cy="10.5" r="6.5" /><path d="M20 20l-4.8-4.8" />
+        </svg>
+        <input
+          type="search"
+          id="search-input"
+          placeholder="جستجو در سیستم‌ها..."
+          aria-label="جستجو در سیستم‌های پورتال"
+          autocomplete="off"
+        />
+        <button type="button" id="search-clear" class="search-clear" aria-label="پاک کردن جستجو" hidden>
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <path d="M5 5l14 14M19 5L5 19" />
+          </svg>
+        </button>
+      </div>
+
+      <button type="button" id="theme-toggle" class="theme-toggle" aria-label="تغییر حالت روشن/تیره" title="تغییر حالت روشن/تیره">
+        <svg class="icon icon--sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4.5" /><path d="M12 2.5v2.5M12 19v2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M2.5 12H5M19 12h2.5M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8" />
+        </svg>
+        <svg class="icon icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" />
+        </svg>
+      </button>
+
+      <!-- v2.0 Part 1: replaces the old network-status indicator. Shows
+           "🔐 ورود مدیر" by default; admin-widget.js swaps it for
+           "👤 مدیر سیستم" (with a dropdown) after a successful login.
+           Login itself happens in the inline modal below — no direct
+           login page is ever shown from the header. Gracefully does
+           nothing if the PHP backend isn't deployed at all (session
+           check just fails silently and the button stays in its
+           logged-out state). -->
+      <!-- Temporary (until Phase 5's proper portal integration): a
+           single button linking to the hospital form-system's shared
+           login page. Address is placeholder-editable via
+           data/config.json's "formsSystemUrl" (set in app.js's
+           renderFooter()) — no code change needed to update it later. -->
+      <a href="#" id="forms-widget-link" class="admin-widget__btn forms-widget__btn" target="_blank" rel="noopener">
+        <span aria-hidden="true">📝</span>
+        <span>ورود به فرم‌ها</span>
+      </a>
+
+      <div class="admin-widget">
+        <button type="button" id="admin-widget-btn" class="admin-widget__btn" aria-haspopup="true" aria-expanded="false">
+          <span id="admin-widget-icon" aria-hidden="true">🔐</span>
+          <span id="admin-widget-label">ورود مدیر</span>
+        </button>
+
+        <div id="admin-widget-dropdown" class="admin-widget__dropdown" hidden>
+          <a href="admin/dashboard.html" class="admin-widget__dropdown-item">داشبورد مدیریت</a>
+          <button type="button" id="admin-widget-logout" class="admin-widget__dropdown-item admin-widget__dropdown-item--danger">خروج</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- v2.0 Part 1: inline login modal — opened by the header button
+       above, never a full page navigation to admin/login.html. -->
+  <div id="admin-login-overlay" class="admin-modal-overlay" hidden>
+    <form id="admin-login-form" class="admin-modal admin-modal--small" novalidate>
+      <h2>ورود مدیر شبکه</h2>
+      <label class="admin-field">
+        <span>نام کاربری</span>
+        <input type="text" id="admin-login-username" autocomplete="username" required />
+      </label>
+      <label class="admin-field">
+        <span>رمز عبور</span>
+        <input type="password" id="admin-login-password" autocomplete="current-password" required />
+      </label>
+      <div id="admin-login-error" class="admin-error" hidden></div>
+      <div class="admin-modal__actions">
+        <button type="button" class="admin-btn" id="admin-login-cancel">انصراف</button>
+        <button type="submit" class="admin-btn admin-btn--primary" id="admin-login-submit">ورود</button>
+      </div>
+    </form>
+  </div>
+
+  <main class="page-wrap">
+
+    <!-- v2.0: replaces the old single-announcement div. Both start
+         completely empty — announcements.js only ever inserts markup
+         into announcement-banner-slot when there's something active
+         to show, and never leaves an empty box behind (per spec). The
+         popup overlay is a modal layer, so it lives outside <main>. -->
+    <div id="announcement-banner-slot"></div>
+
+    <section id="favorites-section" class="quick-section" hidden>
+      <div class="quick-section__header">
+        <svg class="icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" aria-hidden="true">
+          <path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9Z" />
+        </svg>
+        <h2>موردعلاقه‌ها</h2>
+      </div>
+      <div id="favorites-row" class="row-scroll"></div>
+    </section>
+
+    <section id="recent-section" class="quick-section" hidden>
+      <div class="quick-section__header">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" /><path d="M12 7v5l3.5 2" />
+        </svg>
+        <h2>اخیراً استفاده شده</h2>
+      </div>
+      <div id="recent-row" class="row-scroll"></div>
+    </section>
+
+    <div id="categories-container" class="categories"></div>
+
+    <div id="empty-state" class="empty-state" hidden>
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="10.5" cy="10.5" r="6.5" /><path d="M20 20l-4.8-4.8" />
+      </svg>
+      <p>هیچ سیستمی با این عبارت پیدا نشد.</p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <span id="footer-version">نسخه 12.0.0</span>
+    <span id="footer-update">آخرین به‌روزرسانی: —</span>
+    <span id="footer-dept">واحد فناوری اطلاعات بیمارستان</span>
+  </footer>
+
+  <!-- FEATURE 3 (PWA): shown when the browser loses connectivity; last
+       loaded data keeps working thanks to the service worker cache. -->
+  <div id="offline-banner" class="offline-banner" role="status" hidden>
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M3 8.5a16 16 0 0 1 18 0" /><path d="M6.5 12.2a11 11 0 0 1 11 0" /><path d="M10 16a5.5 5.5 0 0 1 4 0" />
+      <path d="M4 4l16 16" />
+    </svg>
+    <span>ارتباط با سرور قطع شده است.<br />نمایش اطلاعات ذخیره‌شده.</span>
+    <!-- PART 2: generic dismiss button, wired by app.js's dismissBanner() -->
+    <button type="button" class="banner-close" data-banner-id="offline-banner" aria-label="بستن اعلان">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <path d="M5 5l14 14M19 5L5 19" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- FEATURE 3 (PWA): shown once a new service worker has installed
+       in the background, letting the user reload on their own terms. -->
+  <div id="update-banner" class="update-banner" role="status" hidden>
+    <span>نسخه جدید پرتال آماده نصب است.</span>
+    <button type="button" id="update-reload-btn">بروزرسانی</button>
+    <button type="button" id="update-later-btn">بعداً</button>
+    <!-- PART 2: generic dismiss button, wired by app.js's dismissBanner() -->
+    <button type="button" class="banner-close" data-banner-id="update-banner" aria-label="بستن اعلان">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <path d="M5 5l14 14M19 5L5 19" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- v2.0: popup-mode announcements render here as a modal queue —
+       see assets/js/announcements.js. Empty/hidden when there is
+       nothing to show. -->
+  <div id="announcement-popup-overlay" class="announcement-popup-overlay" hidden></div>
+
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- v2.0.0 : bump these query strings (and config.json's portalVersion)
+       together on every deploy so browsers never serve stale scripts. -->
+  <script src="assets/js/storage.js?v=2.0.0"></script>
+  <script src="assets/js/theme.js?v=2.0.0"></script>
+  <script src="assets/js/favorites.js?v=2.0.0"></script>
+  <script src="assets/js/recent.js?v=2.0.0"></script>
+  <script src="assets/js/statistics.js?v=2.0.0"></script>
+  <script src="assets/js/search.js?v=2.0.0"></script>
+  <script src="assets/js/data-loader.js?v=2.0.0"></script>
+  <script src="assets/js/status.js?v=2.0.0"></script>
+  <script src="assets/js/announcements.js?v=2.0.0"></script>
+  <script src="assets/js/link-checker.js?v=2.0.0"></script>
+  <script src="assets/js/pwa.js?v=2.0.0"></script>
+  <script src="assets/js/admin-widget.js?v=2.0.0"></script>
+  <script src="assets/js/app.js?v=2.0.0"></script>
+</body>
+</html>

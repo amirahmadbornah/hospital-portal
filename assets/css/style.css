@@ -1,0 +1,1040 @@
+/* =========================================================================
+   Hospital Internal Portal — v12
+   Design language: Material-inspired glassmorphism, soft medical-teal
+   gradients, rounded geometry, RTL Persian layout.
+   ========================================================================= */
+
+/* -------------------------------------------------------------------------
+   Fonts
+   IranSans is a licensed commercial typeface — the hospital IT department
+   must supply the licensed .woff2 files under assets/fonts/ with these
+   exact names. Vazirmatn (OFL-licensed, metric-compatible look-and-feel)
+   is bundled as a safe open fallback so the portal still looks correct
+   out of the box before those files are added.
+   ------------------------------------------------------------------------- */
+@font-face {
+  font-family: 'IRANSans';
+  src: url('../fonts/IRANSansX-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'IRANSans';
+  src: url('../fonts/IRANSansX-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'IRANSans';
+  src: url('../fonts/IRANSansX-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('../fonts/Vazirmatn-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('../fonts/Vazirmatn-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('../fonts/Vazirmatn-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
+
+/* -------------------------------------------------------------------------
+   Design tokens
+   ------------------------------------------------------------------------- */
+:root {
+  /* Brand / medical-teal gradient family */
+  --color-primary: #0F6E67;
+  --color-primary-light: #14B8A6;
+  --color-primary-dark: #0B4F4A;
+
+  --color-info: #0EA5E9;
+  --color-success: #22A559;
+  --color-warning: #F0A500;
+  --color-danger: #E5484D;
+
+  --color-fav: #F5A623;
+
+  /* Light theme surface tokens */
+  --bg-base: #EEF6F5;
+  --bg-gradient: radial-gradient(1200px 800px at 90% -10%, #d8f3ee 0%, #EEF6F5 45%), radial-gradient(900px 700px at -10% 110%, #e4f1fb 0%, #EEF6F5 50%);
+  --surface: rgba(255, 255, 255, 0.72);
+  --surface-solid: #ffffff;
+  --surface-border: rgba(15, 110, 103, 0.14);
+  --text-primary: #10231f;
+  --text-secondary: #4b6360;
+  --text-muted: #7c928f;
+  --shadow-soft: 0 10px 30px rgba(16, 60, 55, 0.08);
+  --shadow-lift: 0 20px 45px rgba(16, 60, 55, 0.16);
+  --header-bg: rgba(255, 255, 255, 0.55);
+
+  --radius-lg: 22px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
+
+  --font-display: 'IRANSans', 'Vazirmatn', Tahoma, sans-serif;
+  --font-body: 'IRANSans', 'Vazirmatn', Tahoma, sans-serif;
+
+  --transition-fast: 160ms cubic-bezier(.4,0,.2,1);
+  --transition-med: 320ms cubic-bezier(.4,0,.2,1);
+}
+
+[data-theme='dark'] {
+  --color-primary: #1FCBB8;
+  --color-primary-light: #2DE0C9;
+  --color-primary-dark: #0B4F4A;
+
+  --bg-base: #0A1512;
+  --bg-gradient: radial-gradient(1200px 800px at 90% -10%, #0f2e29 0%, #0A1512 45%), radial-gradient(900px 700px at -10% 110%, #0c2333 0%, #0A1512 50%);
+  --surface: rgba(20, 34, 31, 0.62);
+  --surface-solid: #10201d;
+  --surface-border: rgba(45, 224, 201, 0.16);
+  --text-primary: #eaf6f3;
+  --text-secondary: #a9c4bf;
+  --text-muted: #6f8b86;
+  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --shadow-lift: 0 20px 45px rgba(0, 0, 0, 0.45);
+  --header-bg: rgba(10, 21, 18, 0.55);
+}
+
+/* -------------------------------------------------------------------------
+   Reset + base
+   ------------------------------------------------------------------------- */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+html {
+  direction: rtl;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  font-family: var(--font-body);
+  background: var(--bg-gradient), var(--bg-base);
+  color: var(--text-primary);
+  transition: background-color var(--transition-med), color var(--transition-med);
+  line-height: 1.6;
+}
+
+body.theme-transitioning * {
+  transition: background-color var(--transition-med), color var(--transition-med), border-color var(--transition-med) !important;
+}
+
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+ul { margin: 0; padding: 0; list-style: none; }
+img { max-width: 100%; display: block; }
+
+:focus-visible {
+  outline: 2.5px solid var(--color-info);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Several components (.announcement, .offline-banner, .update-banner,
+   .empty-state) set their own `display: flex` for layout. Author CSS
+   always wins over the browser's built-in `[hidden] { display: none }`
+   rule, no matter the specificity — so without this override, setting
+   `.hidden = true` in JS silently does nothing on any element that
+   also has a display rule of its own. This single rule guarantees the
+   hidden attribute always actually hides the element. */
+[hidden] {
+  display: none !important;
+}
+
+/* -------------------------------------------------------------------------
+   Loading overlay
+   ------------------------------------------------------------------------- */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: var(--bg-base);
+  z-index: 999;
+  transition: opacity var(--transition-med), visibility var(--transition-med);
+}
+.loading-overlay.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.loading-spinner {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 4px solid var(--surface-border);
+  border-top-color: var(--color-primary);
+  animation: spin 0.9s linear infinite;
+}
+.loading-overlay span {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* -------------------------------------------------------------------------
+   Layout shell
+   ------------------------------------------------------------------------- */
+.page-wrap {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 0 20px 60px;
+}
+
+/* -------------------------------------------------------------------------
+   Header
+   ------------------------------------------------------------------------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--surface-border);
+}
+.header-inner {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1 1 220px;
+  min-width: 0;
+}
+.brand__logo {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--color-primary-light), var(--color-primary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-soft);
+}
+.brand__logo svg { width: 24px; height: 24px; }
+.brand__text { min-width: 0; }
+.brand__title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.brand__subtitle {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.header-clock {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  box-shadow: var(--shadow-soft);
+  white-space: nowrap;
+}
+.header-clock .icon { width: 18px; height: 18px; color: var(--color-primary); }
+.header-clock__time { font-weight: 700; font-size: 0.95rem; letter-spacing: 0.5px; }
+.header-clock__date { font-size: 0.78rem; color: var(--text-secondary); }
+
+.header-search {
+  position: relative;
+  flex: 1 1 260px;
+  max-width: 420px;
+}
+.header-search input {
+  width: 100%;
+  padding: 11px 42px 11px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--surface-border);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 0.92rem;
+  transition: box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+.header-search input::placeholder { color: var(--text-muted); }
+.header-search input:focus {
+  border-color: var(--color-primary-light);
+  box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.15);
+  outline: none;
+}
+.header-search .icon--search {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 17px;
+  height: 17px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+.search-clear {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.search-clear:hover { background: var(--surface-border); }
+.search-clear .icon { width: 14px; height: 14px; }
+
+.theme-toggle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--surface-border);
+  background: var(--surface);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-soft);
+  transition: transform var(--transition-fast);
+}
+.theme-toggle:hover { transform: translateY(-2px); }
+.theme-toggle .icon { width: 20px; height: 20px; }
+.theme-toggle .icon--moon { display: none; }
+[data-theme='dark'] .theme-toggle .icon--sun { display: none; }
+[data-theme='dark'] .theme-toggle .icon--moon { display: block; }
+
+/* PWA: network status indicator (feature #9). Color is a secondary
+   cue only — the "متصل"/"قطع" text label is the real signal, so this
+   never relies on color alone for meaning. */
+.network-status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.network-status__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #9aa5a3;
+  flex-shrink: 0;
+  transition: background var(--transition-fast);
+}
+.network-status--online .network-status__dot { background: var(--color-success); }
+.network-status--offline .network-status__dot { background: var(--color-danger); }
+
+/* Shared slide-in animation, used by the admin dropdown, announcement
+   banner/popup, and the offline/update banners further down. */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* -------------------------------------------------------------------------
+   v2.0 Part 1: header admin-login widget (🔐 ورود مدیر / 👤 مدیر سیستم)
+   ------------------------------------------------------------------------- */
+.admin-widget { position: relative; flex-shrink: 0; }
+.admin-widget__btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--surface-border);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform var(--transition-fast), background var(--transition-fast);
+}
+.admin-widget__btn:hover { transform: translateY(-1px); background: var(--surface-solid); }
+.admin-widget__dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  inset-inline-end: 0;
+  min-width: 190px;
+  background: var(--surface-solid);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lift);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 60;
+  animation: slideDown 200ms ease;
+}
+.admin-widget__dropdown-item {
+  display: block;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-family: inherit;
+  text-align: right;
+  text-decoration: none;
+  cursor: pointer;
+  width: 100%;
+}
+.admin-widget__dropdown-item:hover { background: var(--surface-border); }
+.admin-widget__dropdown-item--danger { color: var(--color-danger); }
+
+/* Temporary forms-system button, next to the admin-login widget (see
+   index.html) — same base look as .admin-widget__btn, with a primary-
+   color accent so the two aren't visually identical. */
+.forms-widget__btn {
+  border-color: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  text-decoration: none;
+}
+.forms-widget__btn:hover { background: var(--color-primary-light); color: #fff; }
+
+/* -------------------------------------------------------------------------
+   v2.0 Part 2: announcement banner slider (popupMode: false)
+   ------------------------------------------------------------------------- */
+.announcement-banner {
+  position: relative;
+  margin: 18px 0 0;
+  padding: 14px 18px 20px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #fff;
+  box-shadow: var(--shadow-soft);
+  animation: slideDown 380ms ease;
+  background: linear-gradient(135deg, var(--color-info), color-mix(in srgb, var(--color-info) 70%, black));
+}
+.announcement-banner--important {
+  background: linear-gradient(135deg, var(--color-warning), color-mix(in srgb, var(--color-warning) 70%, black));
+}
+.announcement-banner--critical {
+  background: linear-gradient(135deg, var(--color-danger), color-mix(in srgb, var(--color-danger) 70%, black));
+}
+.announcement-banner__close {
+  position: absolute;
+  top: 12px;
+  inset-inline-end: 14px;
+}
+.announcement-banner__dots {
+  position: absolute;
+  bottom: 7px;
+  inset-inline-start: 18px;
+  display: flex;
+  gap: 6px;
+}
+.announcement-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+.announcement-dot.is-active { background: #fff; transform: scale(1.3); }
+
+/* Shared between the banner and the popup below */
+.announcement-media {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-soft);
+}
+.announcement-text { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.announcement-text strong { font-size: 0.95rem; }
+.announcement-text span { font-size: 0.85rem; opacity: 0.92; }
+
+/* -------------------------------------------------------------------------
+   v2.0 Part 2: announcement popup (popupMode: true) — one at a time,
+   highest priority first (see AnnouncementsManager in announcements.js)
+   ------------------------------------------------------------------------- */
+.announcement-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 20, 18, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 400;
+}
+.announcement-popup {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  background: var(--surface-solid);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lift);
+  padding: 30px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+  border-top: 4px solid var(--color-info);
+  animation: slideDown 300ms ease;
+}
+.announcement-popup--important { border-top-color: var(--color-warning); }
+.announcement-popup--critical { border-top-color: var(--color-danger); }
+.announcement-popup .announcement-media {
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  max-height: 220px;
+  border-radius: var(--radius-md);
+}
+.announcement-popup .announcement-text { align-items: center; }
+.announcement-popup .announcement-text strong { font-size: 1.1rem; }
+.announcement-popup .announcement-text span {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  opacity: 1;
+  white-space: pre-line;
+}
+.announcement-popup__close {
+  position: absolute;
+  top: 12px;
+  inset-inline-end: 12px;
+  color: var(--text-muted);
+  background: var(--surface);
+}
+
+/* PART 2: shared close (×) button for every banner type — announcement,
+   offline and update. Uses currentColor so it adapts to each banner's
+   own text color (white on the colored banners, normal text on the
+   neutral offline banner) without any layout shift. */
+.banner-close {
+  border: none;
+  background: color-mix(in srgb, currentColor 14%, transparent);
+  color: inherit;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+.banner-close .icon { width: 13px; height: 13px; }
+.banner-close:hover {
+  background: color-mix(in srgb, currentColor 26%, transparent);
+  transform: scale(1.06);
+}
+
+/* -------------------------------------------------------------------------
+   Quick access rows (Favorites / Recently used)
+   ------------------------------------------------------------------------- */
+.quick-section { margin-top: 30px; }
+.quick-section__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.quick-section__header h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+}
+.quick-section__header .icon { width: 18px; height: 18px; color: var(--color-fav); }
+.row-scroll {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scroll-snap-type: x proximity;
+}
+.row-scroll::-webkit-scrollbar { height: 6px; }
+.row-scroll::-webkit-scrollbar-thumb { background: var(--surface-border); border-radius: 6px; }
+
+/* -------------------------------------------------------------------------
+   Categories + grid
+   ------------------------------------------------------------------------- */
+.categories { margin-top: 38px; display: flex; flex-direction: column; gap: 34px; }
+.category__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.category__icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.category__icon .icon { width: 19px; height: 19px; }
+.category__title { font-size: 1.08rem; font-weight: 700; margin: 0; }
+.category__count {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 999px;
+  padding: 2px 10px;
+  margin-inline-start: auto;
+}
+.category__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+/* -------------------------------------------------------------------------
+   Cards
+   ------------------------------------------------------------------------- */
+.card {
+  --accent: #14B8A6;
+  position: relative;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  box-shadow: var(--shadow-soft);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+  animation: cardIn 420ms ease both;
+}
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(10px) scale(.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 10%, transparent), transparent 60%);
+  pointer-events: none;
+}
+.card:hover, .card:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lift);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--surface-border));
+}
+.card__badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: var(--color-fav);
+  color: #201400;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 999px;
+  box-shadow: 0 4px 10px rgba(245, 166, 35, 0.4);
+}
+.card__icon {
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 85%, white), var(--accent));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+.card__icon .icon { width: 24px; height: 24px; }
+.card__body { flex: 1; min-width: 0; }
+.card__title {
+  margin: 0 0 4px;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.card__desc {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.card__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: auto;
+}
+.card__fav, .card__open {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--surface-border);
+  background: var(--surface-solid);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--transition-fast), color var(--transition-fast), background var(--transition-fast);
+}
+.card__fav .icon, .card__open .icon { width: 16px; height: 16px; }
+.card__fav:hover { transform: scale(1.08); color: var(--color-fav); }
+.card__fav--active { color: var(--color-fav); }
+.card__fav--active .icon { fill: currentColor; }
+.card__open { color: #fff; background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 70%, black)); border-color: transparent; }
+.card__open:hover { transform: scale(1.08); }
+
+.card--compact {
+  flex-direction: row;
+  align-items: center;
+  min-width: 240px;
+  scroll-snap-align: start;
+  padding: 12px 14px;
+  gap: 10px;
+}
+.card--compact .card__icon { width: 38px; height: 38px; flex-shrink: 0; }
+.card--compact .card__icon .icon { width: 20px; height: 20px; }
+.card--compact .card__title { font-size: 0.88rem; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card--compact .card__actions { margin-top: 0; flex-shrink: 0; }
+.card--compact .card__fav, .card--compact .card__open { width: 30px; height: 30px; }
+.card--compact .card__fav .icon, .card--compact .card__open .icon { width: 14px; height: 14px; }
+
+/* Ripple */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 35%, transparent);
+  transform: scale(0);
+  animation: rippleAnim 550ms ease-out;
+  pointer-events: none;
+}
+@keyframes rippleAnim {
+  to { transform: scale(1); opacity: 0; }
+}
+
+/* -------------------------------------------------------------------------
+   FEATURE 1: System health status indicator
+   A small dot overlaid on the existing card — no change to card layout.
+   ------------------------------------------------------------------------- */
+.card__status {
+  position: absolute;
+  top: 12px;
+  inset-inline-end: 12px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  z-index: 2;
+  cursor: default;
+}
+.card--compact .card__status {
+  top: 7px;
+  inset-inline-end: 7px;
+  width: 9px;
+  height: 9px;
+}
+.card__badge ~ .card__status {
+  /* keep the "new" badge and the status dot from overlapping */
+  top: 12px;
+  inset-inline-end: auto;
+  inset-inline-start: 12px;
+}
+
+.status--online {
+  background: var(--color-success);
+  animation: statusPulse 2.2s ease-in-out infinite;
+}
+.status--slow {
+  background: var(--color-warning);
+  animation: statusFade 1.8s ease-in-out infinite;
+}
+.status--offline {
+  background: var(--color-danger);
+  animation: statusBlink 1.4s steps(2, start) infinite;
+}
+.status--unknown {
+  background: #9aa5a3;
+}
+
+@keyframes statusPulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-success) 55%, transparent); }
+  70% { box-shadow: 0 0 0 7px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+@keyframes statusFade { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@keyframes statusBlink { to { opacity: 0.25; } }
+
+.card__status::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: 130%;
+  inset-inline-end: 0;
+  min-width: 175px;
+  max-width: 230px;
+  padding: 9px 11px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-solid);
+  border: 1px solid var(--surface-border);
+  box-shadow: var(--shadow-lift);
+  color: var(--text-primary);
+  font-size: 0.72rem;
+  line-height: 1.6;
+  white-space: pre-line;
+  text-align: start;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity var(--transition-fast), transform var(--transition-fast), visibility var(--transition-fast);
+  pointer-events: none;
+  z-index: 30;
+}
+.card__status:hover::after,
+.card__status:focus-visible::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* -------------------------------------------------------------------------
+   FEATURE 3: Progressive Web App — offline + update banners
+   ------------------------------------------------------------------------- */
+.offline-banner,
+.update-banner {
+  position: fixed;
+  bottom: 22px;
+  inset-inline-end: 22px;
+  width: 320px;
+  max-width: calc(100vw - 28px);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lift);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  z-index: 210;
+  animation: slideDown 380ms ease;
+}
+.offline-banner span,
+.update-banner span {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.offline-banner {
+  background: var(--surface-solid);
+  border: 1px solid var(--surface-border);
+  color: var(--text-primary);
+}
+.offline-banner > .icon {
+  width: 18px;
+  height: 18px;
+  color: var(--color-warning);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.update-banner {
+  background: linear-gradient(135deg, var(--color-primary-light), var(--color-primary));
+  color: #fff;
+  bottom: 90px;
+  flex-wrap: wrap;
+}
+.update-banner span {
+  flex-basis: 100%;
+  order: -1;
+}
+/* Scoped to the reload button only, so the new .banner-close button
+   (Part 2) keeps its own circular style instead of this pill shape.
+   The message text wraps to its own full-width row above (via
+   flex-wrap + order on the span), so the reload/close buttons always
+   sit together on a clean second row. */
+#update-reload-btn {
+  margin-inline-start: auto;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  transition: background var(--transition-fast);
+}
+#update-reload-btn:hover { background: rgba(255, 255, 255, 0.32); }
+
+/* "بعداً" — a quieter secondary action next to the primary reload
+   button; functionally identical to the × close, offered as a
+   clearer, labeled alternative per the PWA spec's two-button ask. */
+#update-later-btn {
+  flex-shrink: 0;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  transition: background var(--transition-fast);
+}
+#update-later-btn:hover { background: rgba(255, 255, 255, 0.15); }
+
+@media (max-width: 480px) {
+  .offline-banner, .update-banner {
+    inset-inline-end: 14px;
+    inset-inline-start: 14px;
+    max-width: none;
+  }
+}
+
+/* -------------------------------------------------------------------------
+   Empty state
+   ------------------------------------------------------------------------- */
+.empty-state {
+  margin-top: 60px;
+  text-align: center;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.empty-state .icon { width: 46px; height: 46px; opacity: 0.5; }
+
+/* -------------------------------------------------------------------------
+   Toasts
+   ------------------------------------------------------------------------- */
+.toast-container {
+  position: fixed;
+  bottom: 22px;
+  inset-inline-start: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 200;
+}
+.toast {
+  min-width: 220px;
+  max-width: 320px;
+  padding: 12px 14px 12px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-solid);
+  border: 1px solid var(--surface-border);
+  box-shadow: var(--shadow-lift);
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  border-inline-start: 4px solid var(--color-success);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+.toast__text { flex: 1; min-width: 0; }
+/* Closable toasts (قابلیت بستن نوتیفیکیشن): reuse the shared
+   .banner-close button style at a smaller size to match the toast's
+   compact footprint. */
+.toast .banner-close {
+  width: 20px;
+  height: 20px;
+}
+.toast .banner-close .icon { width: 11px; height: 11px; }
+.toast--visible { opacity: 1; transform: translateY(0); }
+.toast--info { border-inline-start-color: var(--color-info); }
+.toast--warning { border-inline-start-color: var(--color-warning); }
+.toast--danger { border-inline-start-color: var(--color-danger); }
+
+/* -------------------------------------------------------------------------
+   Footer
+   ------------------------------------------------------------------------- */
+.site-footer {
+  margin-top: 60px;
+  padding: 18px 4px;
+  border-top: 1px solid var(--surface-border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  justify-content: space-between;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+/* -------------------------------------------------------------------------
+   Responsive
+   ------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  .header-inner { padding: 10px 14px; }
+  .header-clock__date { display: none; }
+  .brand__subtitle { display: none; }
+  .category__grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  .card--compact { min-width: 200px; }
+}
+@media (max-width: 480px) {
+  .header-search { order: 3; flex: 1 1 100%; max-width: none; }
+  .category__grid { grid-template-columns: repeat(2, 1fr); }
+  .card__desc { display: none; }
+}
+
+/* -------------------------------------------------------------------------
+   Reduced motion
+   ------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

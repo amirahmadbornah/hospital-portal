@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>ورود به پنل مدیریت | پورتال بیمارستان</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon/favicon.svg" />
+  <!-- Reuses the portal's own design tokens/animations — never edited by this panel. -->
+  <link rel="stylesheet" href="../assets/css/style.css?v=12.2.2" />
+  <link rel="stylesheet" href="admin.css?v=1.0.0" />
+</head>
+<body>
+  <div class="admin-auth-page">
+    <form id="login-form" class="admin-auth-card" autocomplete="off" novalidate>
+      <div class="admin-auth-card__logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 21s-7.5-4.7-9.8-9.6C.7 7.8 2.6 4.5 6 4.1c2-.2 3.6.8 4.7 2.3M12 21s7.5-4.7 9.8-9.6c1.5-3.6-.4-6.9-3.8-7.3-2-.2-3.6.8-4.7 2.3" />
+          <path d="M9 12h2l1-2 2 4 1-2h2" />
+        </svg>
+      </div>
+      <h1 class="admin-auth-card__title">پنل مدیریت لینک‌ها</h1>
+      <p class="admin-auth-card__subtitle">ورود مخصوص مدیر شبکه</p>
+
+      <label class="admin-field">
+        <span>نام کاربری</span>
+        <input type="text" id="username" name="username" autocomplete="username" required />
+      </label>
+
+      <label class="admin-field">
+        <span>رمز عبور</span>
+        <input type="password" id="password" name="password" autocomplete="current-password" required />
+      </label>
+
+      <div id="login-error" class="admin-error" hidden></div>
+
+      <button type="submit" id="login-btn" class="admin-btn admin-btn--primary">ورود</button>
+    </form>
+  </div>
+
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <script src="../assets/js/storage.js?v=1.0.0"></script>
+  <script src="../assets/js/theme.js?v=1.0.0"></script>
+  <script src="admin.js?v=1.0.0"></script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>مدیریت اعلان‌ها | پورتال بیمارستان</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon/favicon.svg" />
+  <link rel="stylesheet" href="../assets/css/style.css?v=2.0.0" />
+  <link rel="stylesheet" href="admin.css?v=2.0.0" />
+</head>
+<body>
+  <header class="site-header admin-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand__logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 21s-7.5-4.7-9.8-9.6C.7 7.8 2.6 4.5 6 4.1c2-.2 3.6.8 4.7 2.3M12 21s7.5-4.7 9.8-9.6c1.5-3.6-.4-6.9-3.8-7.3-2-.2-3.6.8-4.7 2.3" />
+            <path d="M9 12h2l1-2 2 4 1-2h2" />
+          </svg>
+        </div>
+        <div class="brand__text">
+          <h1 class="brand__title">مدیریت اعلان‌ها</h1>
+          <p class="brand__subtitle" id="admin-username-label">—</p>
+        </div>
+      </div>
+
+      <button type="button" id="theme-toggle" class="theme-toggle" aria-label="تغییر حالت روشن/تیره" title="تغییر حالت روشن/تیره">
+        <svg class="icon icon--sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4.5" /><path d="M12 2.5v2.5M12 19v2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M2.5 12H5M19 12h2.5M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8" />
+        </svg>
+        <svg class="icon icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" />
+        </svg>
+      </button>
+
+      <a href="dashboard.html" class="admin-btn">مدیریت لینک‌ها</a>
+      <a href="../index.html" class="admin-btn" target="_blank" rel="noopener noreferrer">مشاهده پرتال</a>
+      <button type="button" id="logout-btn" class="admin-btn admin-btn--danger">خروج</button>
+    </div>
+  </header>
+
+  <main class="page-wrap admin-main">
+    <div class="admin-toolbar">
+      <div class="header-search admin-search">
+        <svg class="icon icon--search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="10.5" cy="10.5" r="6.5" /><path d="M20 20l-4.8-4.8" />
+        </svg>
+        <input type="search" id="search-input" placeholder="جستجو در عنوان یا پیام..." autocomplete="off" />
+      </div>
+      <select id="status-filter" class="admin-select">
+        <option value="">همه وضعیت‌ها</option>
+        <option value="active">فعال</option>
+        <option value="expired">منقضی‌شده</option>
+        <option value="disabled">غیرفعال</option>
+      </select>
+      <select id="sort-select" class="admin-select">
+        <option value="updatedDesc">جدیدترین ویرایش</option>
+        <option value="createdDesc">جدیدترین ایجاد</option>
+        <option value="priority">اولویت</option>
+        <option value="startDate">تاریخ شروع</option>
+      </select>
+      <button type="button" id="add-announcement-btn" class="admin-btn admin-btn--primary">+ اعلان جدید</button>
+    </div>
+
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>عنوان</th>
+            <th>نوع</th>
+            <th>اولویت</th>
+            <th>بازه زمانی</th>
+            <th>گزینه‌ها</th>
+            <th>وضعیت</th>
+            <th>عملیات</th>
+          </tr>
+        </thead>
+        <tbody id="announcements-tbody"></tbody>
+      </table>
+      <p id="empty-message" class="admin-empty" hidden>اعلانی یافت نشد.</p>
+    </div>
+  </main>
+
+  <!-- Create / edit modal -->
+  <div id="announcement-modal" class="admin-modal-overlay" hidden>
+    <form id="announcement-form" class="admin-modal" novalidate>
+      <h2 id="announcement-modal-title">اعلان جدید</h2>
+      <input type="hidden" id="field-id" />
+      <input type="hidden" id="field-image-path" />
+
+      <label class="admin-field">
+        <span>عنوان</span>
+        <input type="text" id="field-title" required maxlength="200" />
+      </label>
+
+      <label class="admin-field">
+        <span>نوع اعلان</span>
+        <select id="field-type" required>
+          <option value="text">فقط متن</option>
+          <option value="image">فقط تصویر</option>
+          <option value="text-image">متن + تصویر</option>
+        </select>
+      </label>
+
+      <label class="admin-field" id="message-field-wrap">
+        <span>پیام</span>
+        <textarea id="field-message" rows="3" maxlength="2000"></textarea>
+      </label>
+
+      <label class="admin-field" id="image-field-wrap">
+        <span>تصویر (PNG، JPG یا WEBP — حداکثر ۵ مگابایت)</span>
+        <input type="file" id="field-image-file" accept="image/png,image/jpeg,image/webp" />
+        <span id="upload-status" class="admin-upload-status" hidden></span>
+        <img id="image-preview" class="admin-image-preview" hidden alt="پیش‌نمایش تصویر" />
+      </label>
+
+      <label class="admin-field">
+        <span>اولویت</span>
+        <select id="field-priority" required>
+          <option value="normal">عادی</option>
+          <option value="important">مهم</option>
+          <option value="critical">بحرانی</option>
+        </select>
+      </label>
+
+      <label class="admin-field">
+        <span>تاریخ شروع</span>
+        <input type="datetime-local" id="field-start-date" required />
+      </label>
+
+      <label class="admin-field">
+        <span>تاریخ پایان</span>
+        <input type="datetime-local" id="field-end-date" required />
+      </label>
+
+      <label class="admin-checkbox">
+        <input type="checkbox" id="field-enabled" checked />
+        <span>فعال</span>
+      </label>
+      <label class="admin-checkbox">
+        <input type="checkbox" id="field-dismissible" checked />
+        <span>قابل بستن توسط کاربر</span>
+      </label>
+      <label class="admin-checkbox">
+        <input type="checkbox" id="field-show-once" />
+        <span>فقط یک‌بار برای هر کاربر نمایش داده شود</span>
+      </label>
+      <label class="admin-checkbox">
+        <input type="checkbox" id="field-popup-mode" />
+        <span>نمایش به‌صورت Popup (در غیر این صورت: Banner)</span>
+      </label>
+
+      <div id="form-error" class="admin-error" hidden></div>
+
+      <div class="admin-modal__actions">
+        <button type="button" class="admin-btn" id="cancel-form-btn">انصراف</button>
+        <button type="submit" class="admin-btn admin-btn--primary" id="save-announcement-btn">ذخیره</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Delete confirmation modal -->
+  <div id="confirm-modal" class="admin-modal-overlay" hidden>
+    <div class="admin-modal admin-modal--small">
+      <p id="confirm-message">آیا از حذف این اعلان مطمئن هستید؟</p>
+      <div class="admin-modal__actions">
+        <button type="button" class="admin-btn" id="confirm-no-btn">خیر</button>
+        <button type="button" class="admin-btn admin-btn--danger" id="confirm-yes-btn">بله</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <script src="../assets/js/storage.js?v=2.0.0"></script>
+  <script src="../assets/js/theme.js?v=2.0.0"></script>
+  <script src="announcements-admin.js?v=2.0.0"></script>
+</body>
+</html>

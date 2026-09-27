@@ -1,0 +1,22 @@
+{
+  "name": "پورتال داخلی بیمارستان",
+  "short_name": "پورتال بیمارستان",
+  "description": "دسترسی یکپارچه به سیستم‌های بالینی و اداری بیمارستان",
+  "start_url": "./index.html",
+  "scope": "./",
+  "id": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "lang": "fa",
+  "dir": "rtl",
+  "theme_color": "#0F6E67",
+  "background_color": "#EEF6F5",
+  "icons": [
+    { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/icon-256.png", "sizes": "256x256", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/icon-384.png", "sizes": "384x384", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "assets/icons/icon-monochrome.png", "sizes": "512x512", "type": "image/png", "purpose": "monochrome" }
+  ]
+}

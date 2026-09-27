@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  browserconfig.xml
+  Microsoft/Windows tile configuration. Referenced from index.html via
+  <meta name="msapplication-config" content="browserconfig.xml" />.
+  Lets the portal show a proper tile (icon + brand color) when pinned
+  to the Windows Start menu or taskbar.
+-->
+<browserconfig>
+  <msapplication>
+    <tile>
+      <square70x70logo src="assets/icons/mstile-70.png"/>
+      <square150x150logo src="assets/icons/mstile-150.png"/>
+      <square310x310logo src="assets/icons/mstile-310.png"/>
+      <wide310x150logo src="assets/icons/mstile-310x150.png"/>
+      <TileColor>#0F6E67</TileColor>
+    </tile>
+  </msapplication>
+</browserconfig>

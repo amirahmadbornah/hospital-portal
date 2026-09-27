@@ -1,0 +1,25 @@
+# Local configuration and secrets
+/config/config.php
+/config/config.php.bak
+
+# Runtime / operational data
+/data/*.json
+/data/audit.log
+/data/backups/*
+/data/uploads/*
+!/data/backups/.gitkeep
+!/data/uploads/.gitkeep
+
+# Local backups
+*.bak
+*.bak-*
+*.bak.*
+
+# Local test files
+/test-mount.txt
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

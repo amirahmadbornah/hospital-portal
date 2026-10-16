@@ -9,9 +9,8 @@
  *     content immediately after a deploy).
  *   - Render header (clock, Persian date, search, theme switch).
  *   - Render announcement banner.
- *   - Render Favorites / Recently Used rows.
  *   - Render the category grid from links.json.
- *   - Wire up search, favorites, recent tracking, statistics and toasts.
+ *   - Wire up search, statistics and toasts.
  *   - Gate link opening behind a live reachability check (link-checker.js)
  *     before navigating, showing a toast instead of opening a dead link.
  *   - Poll for data changes on an interval and hot-swap the UI when the
@@ -300,12 +299,12 @@
   function buildCard(link, options = {}) {
     const category = state.categoriesById.get(link.category);
     const accent = link.color || (category && category.color) || '#14B8A6';
-    const isFav = window.FavoritesManager.isFavorite(link.id);
 
     const card = document.createElement('article');
     card.className = `card${options.compact ? ' card--compact' : ''}`;
     card.style.setProperty('--accent', accent);
     card.dataset.linkId = link.id;
+    card.dataset.categoryId = link.category;
 
     if (link.new) {
       const badge = document.createElement('span');
@@ -351,25 +350,6 @@
 
     const actions = document.createElement('div');
     actions.className = 'card__actions';
-
-    if (link.favoriteAllowed) {
-      const favBtn = document.createElement('button');
-      favBtn.type = 'button';
-      favBtn.className = `card__fav${isFav ? ' card__fav--active' : ''}`;
-      favBtn.setAttribute('aria-pressed', String(isFav));
-      favBtn.setAttribute(
-        'aria-label',
-        isFav ? 'حذف از موردعلاقه‌ها' : 'افزودن به موردعلاقه‌ها'
-      );
-      favBtn.title = isFav ? 'حذف از موردعلاقه‌ها' : 'افزودن به موردعلاقه‌ها';
-      favBtn.innerHTML = getIcon('star', 'icon icon--star');
-      favBtn.addEventListener('click', (evt) => {
-        evt.stopPropagation();
-        evt.preventDefault();
-        handleFavoriteToggle(link);
-      });
-      actions.appendChild(favBtn);
-    }
 
     const openBtn = document.createElement('a');
     openBtn.className = 'card__open';
@@ -441,35 +421,6 @@
   }
 
   /**
-   * Renders a horizontal row section (Favorites / Recently Used).
-   * @param {HTMLElement} container
-   * @param {Array<Object>} links
-   */
-  function renderRow(container, links) {
-    container.innerHTML = '';
-    if (!links.length) {
-      container.parentElement.hidden = true;
-      return;
-    }
-    container.parentElement.hidden = false;
-    links.forEach((link) => container.appendChild(buildCard(link, { compact: true })));
-  }
-
-  /** Renders Favorites / Recently Used rows based on current storage + links. */
-  function renderQuickAccessRows() {
-    const enabledLinks = state.links.filter((l) => l.enabled);
-    const byId = new Map(enabledLinks.map((l) => [l.id, l]));
-
-    const favIds = window.FavoritesManager.getAll();
-    const favLinks = favIds.map((id) => byId.get(id)).filter(Boolean);
-    renderRow(els.favoritesRow, favLinks);
-
-    const recentIds = window.RecentManager.getAll();
-    const recentLinks = recentIds.map((id) => byId.get(id)).filter(Boolean);
-    renderRow(els.recentRow, recentLinks);
-  }
-
-  /**
    * Renders the full category grid, respecting the current search
    * query (if any).
    */
@@ -502,6 +453,7 @@
 
       const section = document.createElement('section');
       section.className = 'category';
+      section.dataset.categoryId = category.id;
       section.style.setProperty('--accent', category.color || '#14B8A6');
 
       const header = document.createElement('div');
@@ -602,7 +554,6 @@
   /** Re-renders every dynamic part of the page from current state. */
   function renderAll() {
     renderAnnouncement();
-    renderQuickAccessRows();
     renderCategories();
     renderFooter();
   }
@@ -629,26 +580,15 @@
    * Event handlers
    * ----------------------------------------------------------------- */
 
-  function handleFavoriteToggle(link) {
-    const nowFav = window.FavoritesManager.toggle(link.id);
-    showToast(
-      nowFav ? `«${link.title}» به موردعلاقه‌ها افزوده شد` : `«${link.title}» از موردعلاقه‌ها حذف شد`,
-      nowFav ? 'success' : 'info'
-    );
-    renderAll();
-  }
-
   function handleLinkOpened(link) {
-    window.RecentManager.record(link.id);
     window.StatisticsManager.increment(link.id);
-    renderQuickAccessRows();
   }
 
   /**
    * PART 3: runs a live reachability check via LinkChecker before
    * actually opening a link. On success (or when the check is merely
    * unverifiable due to CORS — see link-checker.js), behaves exactly
-   * like the original click handler: records recent/stats, opens a
+   * like the original click handler: records usage statistics, opens a
    * new tab. Only a *confirmed* offline result or a real timeout
    * blocks the tab and shows a toast instead. PART 5: guarded by
    * state.pendingChecks so a fast double click/tap never fires two
@@ -755,15 +695,12 @@
         if (changed.announcements) renderAnnouncement();
 
         if (changed.links) {
-          // Links (and therefore cards) changed, so rebuild the grid
-          // and quick-access rows; the fresh status data is already
+          // Links changed, so rebuild the grid; fresh status data is already
           // baked into buildCard(), so no separate status pass needed.
           renderCategories();
-          renderQuickAccessRows();
         } else if (changed.status) {
           // Only the health data changed: update just the status dots.
           updateStatusIndicators();
-          renderQuickAccessRows();
         }
 
         if (changed.config) {
@@ -802,10 +739,6 @@
     els.themeToggle = document.getElementById('theme-toggle');
     els.searchInput = document.getElementById('search-input');
     els.searchClear = document.getElementById('search-clear');
-    els.favoritesSection = document.getElementById('favorites-section');
-    els.favoritesRow = document.getElementById('favorites-row');
-    els.recentSection = document.getElementById('recent-section');
-    els.recentRow = document.getElementById('recent-row');
     els.categoriesContainer = document.getElementById('categories-container');
     els.emptyState = document.getElementById('empty-state');
     els.toastContainer = document.getElementById('toast-container');
@@ -873,7 +806,7 @@
 
   /** Used only if localStorage itself is unavailable at boot time. */
   function showToastFallback() {
-    console.warn('[app] localStorage is not available; favorites, recent and stats will not persist.');
+    console.warn('[app] localStorage is not available; usage statistics will not persist.');
   }
 
   document.addEventListener('DOMContentLoaded', init);

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">
+  <title>رنگ‌بندی پرتال</title>
+  <link rel="stylesheet" href="../assets/css/style.css?v=12.2.2">
+  <link rel="stylesheet" href="admin.css?v=1.0.0">
+  <link rel="stylesheet" href="../assets/css/hospital-design-system.css?v=20261016.4">
+  <link rel="stylesheet" href="../assets/css/hospital-portal.css?v=20261016.4">
+</head>
+<body>
+  <header class="site-header"><div class="header-inner">
+    <div class="brand"><h1 class="brand__title">رنگ‌بندی پرتال</h1></div>
+    <a class="admin-btn" href="dashboard.html">مدیریت لینک‌ها</a>
+    <a class="admin-btn" href="../index.html">مشاهده پرتال</a>
+  </div></header>
+  <main class="page-wrap">
+    <form id="appearance-form" class="card portal-appearance-form" hidden>
+      <h2>رنگ‌بندی صفحه</h2>
+      <p>رنگ‌های ذخیره‌شده برای همه کاربران پرتال اعمال می‌شوند. حالت تیرهٔ کاربران حفظ می‌شود.</p>
+      <div id="page-colors" class="portal-color-grid"></div>
+      <h2>رنگ دسته‌بندی‌ها</h2>
+      <div id="category-colors" class="portal-color-grid"></div>
+      <div class="portal-color-actions">
+        <button type="submit" id="save-appearance" class="admin-btn admin-btn--primary">ذخیره و اعمال رنگ‌ها</button>
+        <button type="button" id="reset-appearance" class="admin-btn">رنگ‌های پیش‌فرض</button>
+      </div>
+      <p id="appearance-status" role="status" aria-live="polite"></p>
+    </form>
+    <p id="appearance-loading" role="status">در حال دریافت تنظیمات…</p>
+  </main>
+  <script src="../assets/js/storage.js?v=1.0.0"></script>
+  <script src="../assets/js/theme.js?v=1.0.0"></script>
+  <script src="../assets/js/hospital-shell.js?v=20261016.4"></script>
+  <script src="../assets/js/portal-appearance.js?v=20261016.4"></script>
+  <script src="appearance.js?v=20261016.4"></script>
+</body>
+</html>

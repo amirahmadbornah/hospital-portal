@@ -13,7 +13,7 @@
 
   <!-- PWA: installable on desktop, Android and tablets -->
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#0F6E67" />
+  <meta name="theme-color" content="#0B1F33" />
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
 
   <!-- PWA: Apple/Safari support (feature #14) -->
@@ -22,12 +22,14 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 
   <!-- PWA: Microsoft/Windows tile support (feature #15) -->
-  <meta name="msapplication-TileColor" content="#0F6E67" />
+  <meta name="msapplication-TileColor" content="#0B1F33" />
   <meta name="msapplication-config" content="browserconfig.xml" />
 
   <!-- v12.3.0 : bump this query string (and config.json's portalVersion)
        on every deploy so browsers never serve a stale stylesheet. -->
   <link rel="stylesheet" href="assets/css/style.css?v=2.0.0" />
+  <link rel="stylesheet" href="assets/css/hospital-design-system.css?v=20261016.4" />
+  <link rel="stylesheet" href="assets/css/hospital-portal.css?v=20261016.4" />
 </head>
 <body>
 
@@ -151,26 +153,6 @@
          popup overlay is a modal layer, so it lives outside <main>. -->
     <div id="announcement-banner-slot"></div>
 
-    <section id="favorites-section" class="quick-section" hidden>
-      <div class="quick-section__header">
-        <svg class="icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" aria-hidden="true">
-          <path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9Z" />
-        </svg>
-        <h2>موردعلاقه‌ها</h2>
-      </div>
-      <div id="favorites-row" class="row-scroll"></div>
-    </section>
-
-    <section id="recent-section" class="quick-section" hidden>
-      <div class="quick-section__header">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="9" /><path d="M12 7v5l3.5 2" />
-        </svg>
-        <h2>اخیراً استفاده شده</h2>
-      </div>
-      <div id="recent-row" class="row-scroll"></div>
-    </section>
-
     <div id="categories-container" class="categories"></div>
 
     <div id="empty-state" class="empty-state" hidden>
@@ -228,8 +210,6 @@
        together on every deploy so browsers never serve stale scripts. -->
   <script src="assets/js/storage.js?v=2.0.0"></script>
   <script src="assets/js/theme.js?v=2.0.0"></script>
-  <script src="assets/js/favorites.js?v=2.0.0"></script>
-  <script src="assets/js/recent.js?v=2.0.0"></script>
   <script src="assets/js/statistics.js?v=2.0.0"></script>
   <script src="assets/js/search.js?v=2.0.0"></script>
   <script src="assets/js/data-loader.js?v=2.0.0"></script>
@@ -238,6 +218,8 @@
   <script src="assets/js/link-checker.js?v=2.0.0"></script>
   <script src="assets/js/pwa.js?v=2.0.0"></script>
   <script src="assets/js/admin-widget.js?v=2.0.0"></script>
-  <script src="assets/js/app.js?v=2.0.0"></script>
+  <script src="assets/js/app.js?v=20261016.4"></script>
+  <script src="assets/js/hospital-shell.js?v=20261016.4"></script>
+  <script src="assets/js/portal-appearance.js?v=20261016.4"></script>
 </body>
 </html>

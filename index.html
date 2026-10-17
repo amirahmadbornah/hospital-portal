@@ -28,8 +28,8 @@
   <!-- v12.3.0 : bump this query string (and config.json's portalVersion)
        on every deploy so browsers never serve a stale stylesheet. -->
   <link rel="stylesheet" href="assets/css/style.css?v=2.0.0" />
-  <link rel="stylesheet" href="assets/css/hospital-design-system.css?v=20261016.4" />
-  <link rel="stylesheet" href="assets/css/hospital-portal.css?v=20261016.4" />
+  <link rel="stylesheet" href="assets/css/hospital-design-system.css?v=20261017-login" />
+  <link rel="stylesheet" href="assets/css/hospital-portal.css?v=20261017-bale-qr" />
 </head>
 <body>
 
@@ -126,8 +126,8 @@
   <!-- v2.0 Part 1: inline login modal — opened by the header button
        above, never a full page navigation to admin/login.html. -->
   <div id="admin-login-overlay" class="admin-modal-overlay" hidden>
-    <form id="admin-login-form" class="admin-modal admin-modal--small" novalidate>
-      <h2>ورود مدیر شبکه</h2>
+    <form id="admin-login-form" class="admin-modal admin-modal--small" role="dialog" aria-modal="true" aria-labelledby="admin-login-title">
+      <h2 id="admin-login-title">ورود مدیر شبکه</h2>
       <label class="admin-field">
         <span>نام کاربری</span>
         <input type="text" id="admin-login-username" autocomplete="username" required />
@@ -136,7 +136,7 @@
         <span>رمز عبور</span>
         <input type="password" id="admin-login-password" autocomplete="current-password" required />
       </label>
-      <div id="admin-login-error" class="admin-error" hidden></div>
+      <div id="admin-login-error" class="admin-error" role="alert" hidden></div>
       <div class="admin-modal__actions">
         <button type="button" class="admin-btn" id="admin-login-cancel">انصراف</button>
         <button type="submit" class="admin-btn admin-btn--primary" id="admin-login-submit">ورود</button>
@@ -217,9 +217,9 @@
   <script src="assets/js/announcements.js?v=2.0.0"></script>
   <script src="assets/js/link-checker.js?v=2.0.0"></script>
   <script src="assets/js/pwa.js?v=2.0.0"></script>
-  <script src="assets/js/admin-widget.js?v=2.0.0"></script>
-  <script src="assets/js/app.js?v=20261016.4"></script>
-  <script src="assets/js/hospital-shell.js?v=20261016.4"></script>
-  <script src="assets/js/portal-appearance.js?v=20261016.4"></script>
+  <script src="assets/js/admin-widget.js?v=20261017-login"></script>
+  <script src="assets/js/app.js?v=20261017-login"></script>
+  <script src="assets/js/hospital-shell.js?v=20261017-bale-qr"></script>
+  <script src="assets/js/portal-appearance.js?v=20261017-login"></script>
 </body>
 </html>

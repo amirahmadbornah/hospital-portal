@@ -46,6 +46,16 @@
   label('مدیریت'); link('مدیریت لینک‌ها','admin/dashboard.html','🔗',relative==='admin/dashboard.html');
   link('مدیریت اعلان‌ها','admin/announcements.html','📢',relative==='admin/announcements.html');
   link('رنگ‌بندی پرتال','admin/appearance.html','🎨',relative==='admin/appearance.html');
+  const bale=document.createElement('a');
+  bale.className='portal-bale-card'; bale.href='https://ble.ir/Portalmadanibot';
+  bale.target='_blank'; bale.rel='noopener noreferrer'; bale.setAttribute('aria-label','ورود به ربات بله بیمارستان؛ ثبت‌نام پرسنل و ارسال فایل');
+  const baleTitle=document.createElement('strong'); baleTitle.textContent='ربات بله بیمارستان';
+  const baleQr=document.createElement('img'); baleQr.src=new URL('assets/images/bale-bot-qr.svg',root).href;
+  baleQr.alt='کد QR ربات بله بیمارستان'; baleQr.width=165; baleQr.height=165;
+  const baleName=document.createElement('bdi'); baleName.dir='ltr'; baleName.textContent='@Portalmadanibot';
+  const baleCaption=document.createElement('span'); baleCaption.textContent='ثبت‌نام پرسنل و ارسال فایل';
+  const baleHint=document.createElement('small'); baleHint.textContent='اسکن کنید یا روی کد بزنید';
+  bale.append(baleTitle,baleQr,baleName,baleCaption,baleHint); sidebar.append(bale);
   const foot=document.createElement('div'); foot.className='hs-sidebar-footer'; foot.textContent='واحد فناوری اطلاعات بیمارستان'; sidebar.append(foot);
   const shell=document.createElement('div'); shell.className='portal-shell-content';
   for(const el of Array.from(document.body.children)) if(el.matches('header.site-header,main.page-wrap,footer.site-footer'))shell.append(el);

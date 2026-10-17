@@ -106,7 +106,7 @@
     if (response.status === 401) {
       // Session expired/missing mid-use — bounce to login rather than
       // leaving the admin staring at a silently-broken dashboard.
-      window.location.href = 'login.html';
+      window.location.href = '../index.html?login=1&next=' + encodeURIComponent(window.location.pathname + window.location.search);
       throw new Error('نشست شما منقضی شده است.');
     }
 
@@ -207,14 +207,14 @@
     try {
       const result = await callApi('auth.php?action=check');
       if (!result.authenticated) {
-        window.location.href = 'login.html';
+        window.location.href = '../index.html?login=1&next=' + encodeURIComponent(window.location.pathname + window.location.search);
         return false;
       }
       dashboardState.csrfToken = result.csrfToken;
       dashEls.usernameLabel.textContent = result.username || '';
       return true;
     } catch (err) {
-      window.location.href = 'login.html';
+      window.location.href = '../index.html?login=1&next=' + encodeURIComponent(window.location.pathname + window.location.search);
       return false;
     }
   }
@@ -525,7 +525,7 @@
       try {
         await callApi('auth.php?action=logout', { method: 'POST', body: {} });
       } finally {
-        window.location.href = 'login.html';
+        window.location.href = '../index.html';
       }
     });
 

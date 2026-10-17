@@ -99,3 +99,21 @@ body { background:var(--bg-base); color:var(--text-primary); font-family:var(--f
 .portal-color-field { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:14px; border:1px solid var(--surface-border); border-radius:12px; }
 .portal-color-field input { width:58px; height:42px; padding:3px; border:1px solid var(--surface-border); border-radius:8px; cursor:pointer; background:var(--surface); }
 .portal-color-actions { display:flex; flex-wrap:wrap; gap:10px; }
+
+/* Keep authentication on top of the public portal, including its sidebar. */
+#admin-login-overlay { position:fixed; inset:0; z-index:1000; display:flex; align-items:center; justify-content:center; padding:20px; overflow:auto; background:#08182799; }
+#admin-login-form { display:flex; flex-direction:column; gap:18px; width:100%; max-width:400px; max-height:calc(100dvh - 40px); overflow:auto; padding:26px; color:var(--text-primary); }
+#admin-login-form h2 { margin:0; font-size:20px; }
+#admin-login-form .admin-field { display:flex; flex-direction:column; gap:6px; }
+#admin-login-form .admin-field input { width:100%; min-width:0; }
+#admin-login-form .admin-modal__actions { display:flex; justify-content:flex-end; flex-wrap:wrap; gap:10px; }
+#admin-login-error { padding:10px 12px; color:#a32020; background:#fff1f2; border:1px solid #efb5bd; border-radius:10px; }
+
+/* Local QR asset stays readable across the administrator's menu palettes. */
+.portal-bale-card { display:flex; flex-direction:column; align-items:center; gap:8px; flex-shrink:0; margin:16px 8px 0; padding:14px 10px; border:1px solid color-mix(in srgb,var(--menu-text) 24%,transparent); border-radius:14px; background:color-mix(in srgb,var(--menu-text) 6%,transparent); text-align:center; line-height:1.6; }
+.portal-bale-card:hover { background:color-mix(in srgb,var(--menu-text) 11%,transparent); text-decoration:none; }
+.portal-bale-card strong { font-size:14px; }
+.portal-bale-card img { display:block; width:165px; height:165px; max-width:100%; background:#fff; border-radius:8px; }
+.portal-bale-card bdi { font-size:12px; }
+.portal-bale-card span { font-size:12px; }
+.portal-bale-card small { font-size:11px; opacity:.75; }

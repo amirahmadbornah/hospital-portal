@@ -5,7 +5,7 @@
   let csrfToken,defaults,categories;
   async function api(path,body){
     const response=await fetch('../api/'+path,{method:body?'POST':'GET',credentials:'same-origin',cache:'no-store',headers:body?{'Content-Type':'application/json'}:undefined,body:body?JSON.stringify(body):undefined});
-    if(response.status===401){location.href='login.html';throw new Error('ابتدا وارد شوید.');}
+    if(response.status===401){location.href='../index.html?login=1&next='+encodeURIComponent(location.pathname+location.search);throw new Error('ابتدا وارد شوید.');}
     const result=await response.json();if(!response.ok || result.success===false)throw new Error(result.message || 'دریافت اطلاعات انجام نشد.');return result;
   }
   function field(holder,key,title,color,group){
@@ -28,7 +28,7 @@
   async function init(){
     try{
       if(window.ThemeManager)window.ThemeManager.init();
-      const auth=await api('auth.php?action=check');if(!auth.authenticated){location.href='login.html';return;}csrfToken=auth.csrfToken;
+      const auth=await api('auth.php?action=check');if(!auth.authenticated){location.href='../index.html?login=1&next='+encodeURIComponent(location.pathname+location.search);return;}csrfToken=auth.csrfToken;
       const result=await api('appearance.php');defaults=result.defaults;categories=result.categories;
       Object.entries(labels).forEach(([key,label])=>field('page-colors',key,label,result.data.colors[key],'colors'));
       categories.forEach(c=>field('category-colors',c.id,c.title,result.data.categories[c.id],'categories'));

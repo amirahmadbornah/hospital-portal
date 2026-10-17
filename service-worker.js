@@ -30,7 +30,7 @@
  * -----------------------------------------------------------------------
  */
 
-const CACHE_VERSION = 'v2.0.3-logo';
+const CACHE_VERSION = 'v2.0.5-bale-qr';
 const STATIC_CACHE = `hospital-portal-static-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `hospital-portal-runtime-${CACHE_VERSION}`;
 const CURRENT_CACHES = [STATIC_CACHE, RUNTIME_CACHE];
@@ -39,10 +39,11 @@ const CURRENT_CACHES = [STATIC_CACHE, RUNTIME_CACHE];
 // offline load already works.
 const PRECACHE_URLS = [
   './assets/images/logo-madani.png',
-  './assets/js/portal-appearance.js?v=20261016.4',
-  './assets/css/hospital-design-system.css?v=20261016.4',
-  './assets/css/hospital-portal.css?v=20261016.4',
-  './assets/js/hospital-shell.js?v=20261016.4',
+  './assets/images/bale-bot-qr.svg',
+  './assets/js/portal-appearance.js?v=20261017-login',
+  './assets/css/hospital-design-system.css?v=20261017-login',
+  './assets/css/hospital-portal.css?v=20261017-bale-qr',
+  './assets/js/hospital-shell.js?v=20261017-bale-qr',
   './',
   './index.html',
   './manifest.json',
@@ -64,8 +65,8 @@ const PRECACHE_URLS = [
   './assets/js/announcements.js?v=2.0.0',
   './assets/js/link-checker.js?v=2.0.0',
   './assets/js/pwa.js?v=2.0.0',
-  './assets/js/admin-widget.js?v=2.0.0',
-  './assets/js/app.js?v=20261016.4'
+  './assets/js/admin-widget.js?v=20261017-login',
+  './assets/js/app.js?v=20261017-login'
 ];
 
 self.addEventListener('install', (event) => {
